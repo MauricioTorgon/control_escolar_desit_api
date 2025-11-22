@@ -8,6 +8,8 @@ from rest_framework import generics
 from rest_framework import status
 from rest_framework.response import Response
 from django.contrib.auth.models import Group
+from django.shortcuts import get_object_or_404
+import json
 
 class AlumnosAll(generics.CreateAPIView):
     #Verificar si el usuario esta autenticado
@@ -15,7 +17,6 @@ class AlumnosAll(generics.CreateAPIView):
     def get(self, request, *args, **kwargs):
         alumnos = Alumnos.objects.filter(user__is_active = 1).order_by("id")
         lista = AlumnoSerializer(alumnos, many=True).data
-        
         return Response(lista, 200)
     
 class AlumnosView(generics.CreateAPIView):
@@ -27,7 +28,11 @@ class AlumnosView(generics.CreateAPIView):
         return []  # POST no requiere autenticación
     
     #Obtener alumno por ID
-    # TODO: Agregar obtención de alumno por ID
+    def get(self, request, *args, **kwargs):
+        alumno = get_object_or_404(Alumnos, id = request.GET.get("id"))
+        alumno = AlumnoSerializer(alumno, many=False).data
+        # Si todo es correcto, regresamos la información
+        return Response(alumno, 200)
     
     #Registrar nuevo usuario
     @transaction.atomic
