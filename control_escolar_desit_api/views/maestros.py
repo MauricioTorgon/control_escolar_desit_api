@@ -35,7 +35,6 @@ class MaestrosView(generics.CreateAPIView):
         return []  # POST no requiere autenticación
     
     #Obtener maestro por ID
-    # TODO: Agregar obtención de maestro por ID
     def get(self, request, *args, **kwargs):
         maestro = get_object_or_404(Maestros, id = request.GET.get("id"))
         maestro = MaestroSerializer(maestro, many=False).data
@@ -81,8 +80,6 @@ class MaestrosView(generics.CreateAPIView):
         return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
     
     # Actualizar datos del maestro
-    # TODO: Agregar actualización de maestros
-    # Actualizar datos del administrador
     @transaction.atomic
     def put(self, request, *args, **kwargs):
         permission_classes = (permissions.IsAuthenticated,)
