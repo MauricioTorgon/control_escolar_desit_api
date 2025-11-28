@@ -6,6 +6,7 @@ from .views.bootstrap import VersionView
 from control_escolar_desit_api.views import users
 from control_escolar_desit_api.views import alumnos
 from control_escolar_desit_api.views import maestros
+from control_escolar_desit_api.views import materias
 from control_escolar_desit_api.views import auth
 from control_escolar_desit_api.views import bootstrap
 
@@ -14,8 +15,6 @@ urlpatterns = [
         path('admin/', users.AdminView.as_view()),
     #Admin Data
         path('lista-admins/', users.AdminAll.as_view()),
-    #Edit Admin
-        #path('admins-edit/', users.AdminsViewEdit.as_view())
      #Create Alumno
         path('alumnos/', alumnos.AlumnosView.as_view()),
     #Admin Data
@@ -26,6 +25,10 @@ urlpatterns = [
         path('lista-maestros/', maestros.MaestrosAll.as_view()),
     #Total Users
         path('total-usuarios/', users.TotalUsers.as_view()),
+    #Create Materia    
+        path('materias/', materias.MateriasView.as_view()),
+    #Materia Data
+        path('lista-materias/', materias.MateriasAll.as_view()),
     #Login
         path('login/', auth.CustomAuthToken.as_view()),
     #Logout
