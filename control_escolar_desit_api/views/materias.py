@@ -31,7 +31,25 @@ class MateriasAll(generics.CreateAPIView):
 
 class MateriasView(generics.CreateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
-
+    # Obtener una materia por ID
+    def get(self, request, *args, **kwargs):
+        id_materia = request.GET.get("id")
+        if not id_materia:
+            return Response({"message": "ID no proporcionado"}, 400)
+        
+        materia = get_object_or_404(Materias, id=id_materia)
+        serializer = MateriaSerializer(materia)
+        data = serializer.data
+        
+        # Convertir el string JSON de días a una lista real
+        if "dias" in data and data["dias"]:
+            try:
+                data["dias"] = json.loads(data["dias"])
+            except Exception:
+                data["dias"] = []
+                
+        return Response(data, 200)
+    
     # Registrar nueva materia
     @transaction.atomic
     def post(self, request, *args, **kwargs):
@@ -39,7 +57,7 @@ class MateriasView(generics.CreateAPIView):
         nrc = request.data.get("nrc")
         nombre = request.data.get("nombre")
         seccion = request.data.get("seccion")
-        dias_list = request.data.get("dias") # Esto viene como lista ['Lunes', 'Martes']
+        dias_list = request.data.get("dias")
         hora_inicio = request.data.get("hora_inicio")
         hora_fin = request.data.get("hora_fin")
 
@@ -48,7 +66,7 @@ class MateriasView(generics.CreateAPIView):
             return Response({"message": "Ya existe una materia con ese NRC"}, 400)
 
         try:
-            # Convertimos la lista de días a JSON String para guardarla en CharField
+            # Convertimos la lista de días a JSON String
             dias_json = json.dumps(dias_list) if dias_list else "[]"
 
             materia = Materias.objects.create(
