@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.db.models import *
 from django.db import transaction
 from control_escolar_desit_api.serializers import MateriaSerializer
-from control_escolar_desit_api.models import Materias
+from control_escolar_desit_api.models import Materias, Maestros
 from rest_framework import permissions
 from rest_framework import generics
 from rest_framework import status
@@ -60,22 +60,33 @@ class MateriasView(generics.CreateAPIView):
         dias_list = request.data.get("dias")
         hora_inicio = request.data.get("hora_inicio")
         hora_fin = request.data.get("hora_fin")
+        salon = request.data.get("salon")
+        programa = request.data.get("programa")
+        creditos = request.data.get("creditos")
+        id_profesor = request.data.get("profesor")
 
-        # Validación básica de existencia (opcional)
+        # Validación básica
         if Materias.objects.filter(nrc=nrc).exists():
             return Response({"message": "Ya existe una materia con ese NRC"}, 400)
 
         try:
             # Convertimos la lista de días a JSON String
             dias_json = json.dumps(dias_list) if dias_list else "[]"
-
+            
+            profesor_obj = None
+            if id_profesor:
+                profesor_obj = Maestros.objects.filter(id=id_profesor).first()
             materia = Materias.objects.create(
                 nrc=nrc,
                 nombre=nombre,
                 seccion=seccion,
                 dias=dias_json,
                 hora_inicio=hora_inicio,
-                hora_fin=hora_fin
+                hora_fin=hora_fin,
+                salon=salon,
+                programa=programa,
+                creditos=creditos,
+                profesor=profesor_obj
             )
             materia.save()
             
@@ -98,12 +109,20 @@ class MateriasView(generics.CreateAPIView):
             materia.seccion = request.data.get("seccion", materia.seccion)
             materia.hora_inicio = request.data.get("hora_inicio", materia.hora_inicio)
             materia.hora_fin = request.data.get("hora_fin", materia.hora_fin)
+            materia.salon = request.data.get("salon", materia.salon)
+            materia.programa = request.data.get("programa", materia.programa)
+            materia.creditos = request.data.get("creditos", materia.creditos)
             
             # Si se envían días nuevos, los actualizamos
             dias_list = request.data.get("dias")
             if dias_list is not None:
                 materia.dias = json.dumps(dias_list)
 
+            # Actualizar profesor si viene
+            id_profesor = request.data.get("profesor")
+            if id_profesor:
+                materia.profesor = Maestros.objects.filter(id=id_profesor).first()
+                
             materia.save()
             return Response({"message": "Materia actualizada correctamente"}, 200)
         except Exception as e:

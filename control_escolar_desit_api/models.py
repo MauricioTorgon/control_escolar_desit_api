@@ -65,10 +65,14 @@ class Materias(models.Model):
     id = models.BigAutoField(primary_key=True)
     nrc = models.IntegerField(null=True, blank=True)
     nombre = models.CharField(max_length=255, null=True, blank=True)
-    seccion = models.CharField(max_length=255, null=True, blank=True)
+    seccion = models.IntegerField(null=True, blank=True) # Cambiado a Integer por la validación
     dias = models.CharField(max_length=255, null=True, blank=True)
     hora_inicio = models.TimeField(null=True, blank=True)
     hora_fin = models.TimeField(null=True, blank=True)
+    salon = models.CharField(max_length=255, null=True, blank=True)
+    programa = models.CharField(max_length=255, null=True, blank=True)
+    creditos = models.IntegerField(null=True, blank=True)
+    profesor = models.ForeignKey(Maestros, on_delete=models.SET_NULL, null=True, blank=True)
     creation = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update = models.DateTimeField(null=True, blank=True)
 
