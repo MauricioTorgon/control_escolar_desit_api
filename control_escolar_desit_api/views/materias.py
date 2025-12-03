@@ -11,27 +11,31 @@ import json
 from django.shortcuts import get_object_or_404
 
 class MateriasAll(generics.CreateAPIView):
-    # Permiso para usuarios autenticados
+    #Esta función es esencial para todo donde se requiera autorización de inicio de sesión (token)
     permission_classes = (permissions.IsAuthenticated,)
-    
+    # Invocamos la petición GET para obtener todas las materias
     def get(self, request, *args, **kwargs):
         # Obtenemos todas las materias
         materias = Materias.objects.all().order_by("id")
         lista = MateriaSerializer(materias, many=True).data
-        
-        # Convertimos el campo 'dias' de string JSON a lista real para el frontend
         for materia in lista:
             if "dias" in materia and materia["dias"]:
                 try:
                     materia["dias"] = json.loads(materia["dias"])
                 except Exception:
                     materia["dias"] = []
-                    
         return Response(lista, 200)
 
 class MateriasView(generics.CreateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
-    # Obtener una materia por ID
+    # Permisos por método (sobrescribe el comportamiento default)
+    # Verifica que el usuario esté autenticado para las peticiones GET, PUT y DELETE
+    def get_permissions(self):
+        if self.request.method in ['GET', 'PUT', 'DELETE']:
+            return [permissions.IsAuthenticated()]
+        return []  # POST no requiere autenticación
+    
+    #Obtener materia por ID
     def get(self, request, *args, **kwargs):
         id_materia = request.GET.get("id")
         if not id_materia:
@@ -40,7 +44,6 @@ class MateriasView(generics.CreateAPIView):
         materia = get_object_or_404(Materias, id=id_materia)
         serializer = MateriaSerializer(materia)
         data = serializer.data
-        
         # Convertir el string JSON de días a una lista real
         if "dias" in data and data["dias"]:
             try:
@@ -64,9 +67,10 @@ class MateriasView(generics.CreateAPIView):
         programa = request.data.get("programa")
         creditos = request.data.get("creditos")
         id_profesor = request.data.get("profesor")
+        existing_materia=Materias.objects.filter(nrc=nrc).exists()
 
         # Validación básica
-        if Materias.objects.filter(nrc=nrc).exists():
+        if existing_materia:
             return Response({"message": "Ya existe una materia con ese NRC"}, 400)
 
         try:
@@ -100,10 +104,10 @@ class MateriasView(generics.CreateAPIView):
         id_materia = request.data.get("id")
         if not id_materia:
              return Response({"message": "ID de materia no proporcionado"}, 400)
-
         materia = get_object_or_404(Materias, id=id_materia)
 
         try:
+            permission_classes = (permissions.IsAuthenticated,)
             materia.nrc = request.data.get("nrc", materia.nrc)
             materia.nombre = request.data.get("nombre", materia.nombre)
             materia.seccion = request.data.get("seccion", materia.seccion)
@@ -131,13 +135,12 @@ class MateriasView(generics.CreateAPIView):
     # Eliminar materia
     @transaction.atomic
     def delete(self, request, *args, **kwargs):
-        id_materia = request.GET.get("id") # Usamos GET params como en maestros
+        id_materia = request.GET.get("id")
         if not id_materia:
             return Response({"message": "ID no proporcionado"}, 400)
-            
         materia = get_object_or_404(Materias, id=id_materia)
         try:
             materia.delete()
             return Response({"message": "Materia eliminada"}, 200)
         except Exception as e:
-            return Response({"message": "Error al eliminar"}, 500)
+            return Response({"message": "Algo pasó al eliminar"}, 500)

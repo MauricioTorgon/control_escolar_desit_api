@@ -65,7 +65,7 @@ class Materias(models.Model):
     id = models.BigAutoField(primary_key=True)
     nrc = models.IntegerField(null=True, blank=True)
     nombre = models.CharField(max_length=255, null=True, blank=True)
-    seccion = models.IntegerField(null=True, blank=True) # Cambiado a Integer por la validación
+    seccion = models.IntegerField(null=True, blank=True)
     dias = models.CharField(max_length=255, null=True, blank=True)
     hora_inicio = models.TimeField(null=True, blank=True)
     hora_fin = models.TimeField(null=True, blank=True)
