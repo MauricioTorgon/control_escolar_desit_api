@@ -92,7 +92,7 @@ class MateriasView(generics.CreateAPIView):
             materia.nombre = request.data["nombre"]
             materia.seccion = request.data["seccion"]
             materia.hora_inicio = request.data["hora_inicio"]
-            materia.hora_fin = request.data.get["hora_fin"]
+            materia.hora_fin = request.data["hora_fin"]
             materia.salon = request.data["salon"]
             materia.programa = request.data["programa"]
             materia.creditos = request.data["creditos"]
