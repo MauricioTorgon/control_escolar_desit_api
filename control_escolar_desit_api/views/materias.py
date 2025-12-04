@@ -31,7 +31,7 @@ class MateriasView(generics.CreateAPIView):
     # Permisos por método (sobrescribe el comportamiento default)
     # Verifica que el usuario esté autenticado para las peticiones GET, PUT y DELETE
     def get_permissions(self):
-        if self.request.method in ['GET', 'PUT', 'DELETE','PUT']:
+        if self.request.method in ['GET', 'PUT', 'DELETE','POST']:
             return [permissions.IsAuthenticated()]
         return []  # POST no requiere autenticación
     

@@ -72,7 +72,7 @@ class Materias(models.Model):
     salon = models.CharField(max_length=255, null=True, blank=True)
     programa = models.CharField(max_length=255, null=True, blank=True)
     creditos = models.IntegerField(null=True, blank=True)
-    profesor = models.ForeignKey(Maestros, on_delete=models.SET_NULL, null=True, blank=True)
+    profesor = models.ForeignKey(Maestros, on_delete=models.CASCADE, null=True, blank=True)
     creation = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update = models.DateTimeField(null=True, blank=True)
 
