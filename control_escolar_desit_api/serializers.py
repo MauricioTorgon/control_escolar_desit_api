@@ -34,3 +34,4 @@ class MateriaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Materias
         fields = '__all__'
+        depth = 2 # para la tabla de angular donde se muestra el maestro
